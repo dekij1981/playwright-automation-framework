@@ -37,10 +37,10 @@ test.only('Test Case 1: Register User', async ({ browser }) => {
   // Step 7: Click 'Signup' button
   await page.click('button:has-text("Signup")');
 
-  // Step 8: Enter Name into the name field using data-qa attribute
+  // Step 8: Enter Name into the name field
   await page.fill('input[data-qa="signup-name"]', uniqueName);
 
-  // Step 9: Enter Email into the email field using data-qa attribute
+  // Step 9: Enter Email into the email field
   await page.fill('input[data-qa="signup-email"]', uniqueEmail);
 
   // Step 10: Click on the signup button
@@ -80,16 +80,16 @@ test.only('Test Case 1: Register User', async ({ browser }) => {
   // Step 17: Verify that 'ACCOUNT CREATED!' is visible
   await expect(page.locator('text=ACCOUNT CREATED!')).toBeVisible();
 
-  // Step 18: Click 'Continue' button using data-qa attribute
+  // Step 18: Click 'Continue' button using
   await page.click('a[data-qa="continue-button"]');
 
   // Step 19: Verify that 'Logged in as username' is visible using the unique name
   await expect(page.locator(`text=Logged in as ${uniqueName}`)).toBeVisible();
 
-  // Step 20: Click 'Delete Account' button using the updated locator
+  // Step 20: Click 'Delete Account' button
   await page.click('a[href="/delete_account"]');
 
-  // Step 21: Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button using data-qa attribute
+  // Step 21: Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button
   await expect(page.locator('text=ACCOUNT DELETED!')).toBeVisible();
   await page.click('a[data-qa="continue-button"]');
 
