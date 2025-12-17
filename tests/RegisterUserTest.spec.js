@@ -10,7 +10,7 @@ function generateUniqueUser() {
 }
 
 // Test case for user registration
-test.only('Test Case 1: Register User', async ({ browser }) => {
+test('Test Case 1: Register User', async ({ browser }) => {
   // Launch a new browser context
   const context = await browser.newContext();
   const page = await context.newPage();
