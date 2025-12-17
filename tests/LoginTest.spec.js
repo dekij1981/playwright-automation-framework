@@ -32,7 +32,7 @@ test('Test Case 2: c', async ({ browser }) => {
 });
 
 // Test case for user login with incorrect credentials
-test.only('Test Case 3: Login User with incorrect email and password', async ({ browser }) => {
+test('Test Case 3: Login User with incorrect email and password', async ({ browser }) => {
   // Launch a new browser context
   const context = await browser.newContext();
   const page = await context.newPage();
