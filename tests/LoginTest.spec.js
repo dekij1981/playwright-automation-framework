@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 
 // Test case for user login
-test('Test Case 2: c', async ({ browser }) => {
+test('Test Case 2: Login User with correct email and password', async ({ browser }) => {
   // Launch a new browser context
   const context = await browser.newContext();
   const page = await context.newPage();
