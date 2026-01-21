@@ -1,63 +1,58 @@
 // Import Playwright test functions
-const { test, expect } = require('@playwright/test');
+const { test } = require('@playwright/test');
+const HomePage = require('../pages/HomePage');
+const SignupLoginPage = require('../pages/SignupLoginPage');
 
 // Test case for user login
-test('Test Case 2: Login User with correct email and password', async ({ browser }) => {
-  // Launch a new browser context
-  const context = await browser.newContext();
-  const page = await context.newPage();
+test('Test Case 2: Login User with correct email and password', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const signupLoginPage = new SignupLoginPage(page);
 
-  // Step 2: Navigate to the URL
-  await page.goto('http://automationexercise.com');
+  await test.step("Given I am on the home page", async () => {
+    await homePage.navigateToHome();
+    await homePage.verifyTitle();
+  });
 
-  // Step 3: Verify that home page is visible successfully
-  await expect(page).toHaveTitle(/Automation Exercise/);
+  await test.step("When I click on Signup / Login button", async () => {
+    await homePage.clickSignupLogin();
+  });
 
-  // Step 4: Click on 'Signup / Login' button
-  await page.click('text=Signup / Login');
+  await test.step("Then the login section is visible", async () => {
+    await signupLoginPage.verifyLoginSection();
+  });
 
-  // Step 5: Verify 'Login to your account' is visible
-  await expect(page.locator('text=Login to your account')).toBeVisible();
+  await test.step("When I enter correct email and password and login", async () => {
+    await signupLoginPage.login('test1112226@yopmail.com', 'Password123!');
+  });
 
-  // Step 6: Enter correct email address and password
-  await page.fill('input[name="email"]', 'test1112226@yopmail.com'); // Use a valid email
-  await page.fill('input[name="password"]', 'Password123!'); // Use the correct password
-
-  // Step 7: Click 'login' button
-  await page.click('button:has-text("Login")');
-
-  // Step 8: Verify that 'Logged in as username' is visible
-  await expect(page.locator('text=Logged in as Test')).toBeVisible();
-
+  await test.step("Then I should be logged in as username", async () => {
+    await signupLoginPage.verifyLoggedIn('Test');
+  });
 });
 
 // Test case for user login with incorrect credentials
-test('Test Case 3: Login User with incorrect email and password', async ({ browser }) => {
-  // Launch a new browser context
-  const context = await browser.newContext();
-  const page = await context.newPage();
+test('Test Case 3: Login User with incorrect email and password', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const signupLoginPage = new SignupLoginPage(page);
 
-  // Step 2: Navigate to the URL
-  await page.goto('http://automationexercise.com');
+  await test.step("Given I am on the home page", async () => {
+    await homePage.navigateToHome();
+    await homePage.verifyTitle();
+  });
 
-  // Step 3: Verify that home page is visible successfully
-  await expect(page).toHaveTitle(/Automation Exercise/);
+  await test.step("When I click on Signup / Login button", async () => {
+    await homePage.clickSignupLogin();
+  });
 
-  // Step 4: Click on 'Signup / Login' button
-  await page.click('text=Signup / Login');
+  await test.step("Then the login section is visible", async () => {
+    await signupLoginPage.verifyLoginSection();
+  });
 
-  // Step 5: Verify 'Login to your account' is visible
-  await expect(page.locator('text=Login to your account')).toBeVisible();
+  await test.step("When I enter incorrect email and password and login", async () => {
+    await signupLoginPage.login('incorrect@example.com', 'WrongPassword');
+  });
 
-  // Step 6: Enter incorrect email address and password
-  await page.fill('input[name="email"]', 'incorrect@example.com'); // Use an incorrect email
-  await page.fill('input[name="password"]', 'WrongPassword'); // Use an incorrect password
-
-  // Step 7: Click 'login' button
-  await page.click('button:has-text("Login")');
-
-
-  // Step 8: Verify error 'Your email or password is incorrect!' is visible
-  await expect(page.locator('text=Your email or password is incorrect!')).toBeVisible({ timeout: 120000 });
-
+  await test.step("Then I should see login error message", async () => {
+    await signupLoginPage.verifyLoginError();
+  });
 });
