@@ -1,15 +1,21 @@
-const { expect } = require('@playwright/test');
+import { expect, Page, Locator } from '@playwright/test';
 
-class AccountInfoPage {
-  constructor(page) {
+/**
+ * Page Object Model for the Account Information Page.
+ * All methods are typed and leverage Playwright's strong typing support.
+ */
+export class AccountInfoPage {
+  private page: Page;
+
+  constructor(page: Page) {
     this.page = page;
   }
 
-  async verifyAccountInfoPage() {
+  async verifyAccountInfoPage(): Promise<void> {
     await expect(this.page.locator('text=ENTER ACCOUNT INFORMATION')).toBeVisible();
   }
 
-  async fillAccountDetails(name, email, password) {
+  async fillAccountDetails(name: string, email: string, password: string): Promise<void> {
     // Assuming name and email are pre-filled, but to be safe, fill them
     await this.page.fill('input[data-qa="signup-name"]', name);
     await this.page.fill('input[data-qa="signup-email"]', email);
@@ -26,7 +32,18 @@ class AccountInfoPage {
     await this.page.check('input[name="optin"]');
   }
 
-  async fillAddressDetails(firstName, lastName, company, address1, address2, country, state, city, zipcode, mobile) {
+  async fillAddressDetails(
+    firstName: string,
+    lastName: string,
+    company: string,
+    address1: string,
+    address2: string,
+    country: string,
+    state: string,
+    city: string,
+    zipcode: string,
+    mobile: string
+  ): Promise<void> {
     await this.page.fill('input[name="first_name"]', firstName);
     await this.page.fill('input[name="last_name"]', lastName);
     await this.page.fill('input[name="company"]', company);
@@ -39,25 +56,25 @@ class AccountInfoPage {
     await this.page.fill('input[name="mobile_number"]', mobile);
   }
 
-  async createAccount() {
+  async createAccount(): Promise<void> {
     await this.page.click('button:has-text("Create Account")');
   }
 
-  async verifyAccountCreated() {
+  async verifyAccountCreated(): Promise<void> {
     await expect(this.page.locator('text=ACCOUNT CREATED!')).toBeVisible();
   }
 
-  async clickContinue() {
+  async clickContinue(): Promise<void> {
     await this.page.click('a[data-qa="continue-button"]');
   }
 
-  async deleteAccount() {
+  async deleteAccount(): Promise<void> {
     await this.page.click('a[href="/delete_account"]');
   }
 
-  async verifyAccountDeleted() {
+  async verifyAccountDeleted(): Promise<void> {
     await expect(this.page.locator('text=ACCOUNT DELETED!')).toBeVisible();
   }
 }
 
-module.exports = AccountInfoPage;
+// No module.exports; use ES module export

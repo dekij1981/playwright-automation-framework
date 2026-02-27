@@ -1,7 +1,16 @@
-const { expect } = require('@playwright/test');
+import { expect, Page, Locator, BrowserContext, Dialog } from '@playwright/test';
 
-class ContactUsPage {
-  constructor(page) {
+export class ContactUsPage {
+  readonly page: Page;
+  readonly contactForm: Locator;
+  readonly name: Locator;
+  readonly email: Locator;
+  readonly subject: Locator;
+  readonly message: Locator;
+  readonly upload: Locator;
+  readonly submitBtn: Locator;
+
+  constructor(page: Page) {
     this.page = page;
     this.contactForm = this.page.locator('#contact-page form');
     this.name = this.contactForm.locator('input[data-qa="name"]');
@@ -12,12 +21,12 @@ class ContactUsPage {
     this.submitBtn = this.contactForm.getByRole('button', { name: /^submit$/i });
   }
 
-  async verifyPageLoaded() {
+  async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
     await expect(this.contactForm).toBeVisible();
   }
 
-  async fillForm(name, email, subject, message) {
+  async fillForm(name: string, email: string, subject: string, message: string): Promise<void> {
     await expect(this.name).toBeEditable();
     await expect(this.email).toBeEditable();
     await expect(this.subject).toBeEditable();
@@ -38,7 +47,7 @@ class ContactUsPage {
     await expect(this.message).toHaveValue(message);
   }
 
-  async uploadFile() {
+  async uploadFile(): Promise<void> {
     await this.upload.setInputFiles({
       name: 'contact.txt',
       mimeType: 'text/plain',
@@ -46,18 +55,18 @@ class ContactUsPage {
     });
   }
 
-async submitForm() {
-  await this.submitBtn.scrollIntoViewIfNeeded();
-  await expect(this.submitBtn).toBeEnabled();
+  async submitForm(): Promise<void> {
+    await this.submitBtn.scrollIntoViewIfNeeded();
+    await expect(this.submitBtn).toBeEnabled();
 
-  // Handle the confirmation dialog that appears on submit
-  await Promise.all([
-    this.page.waitForEvent('dialog').then(d => d.accept()),
-    this.submitBtn.click(),
-  ]);
-}
+    // Handle the confirmation dialog that appears on submit
+    await Promise.all([
+      this.page.waitForEvent('dialog').then((dialog: Dialog) => dialog.accept()),
+      this.submitBtn.click(),
+    ]);
+  }
 
-  async verifySuccessMessage() {
+  async verifySuccessMessage(): Promise<void> {
     const successMsg = this.page
       .locator('.status.alert.alert-success, #success-subscribe .alert-success')
       .filter({ hasText: 'Success! Your details have been submitted successfully.' })
@@ -65,5 +74,3 @@ async submitForm() {
     await expect(successMsg).toBeVisible({ timeout: 20_000 });
   }
 }
-
-module.exports = ContactUsPage;

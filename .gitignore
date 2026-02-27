@@ -54,3 +54,6 @@ Thumbs.db
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Slingshot (tool-generated files)
+slingshot/

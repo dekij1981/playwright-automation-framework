@@ -1,9 +1,8 @@
-// Import Playwright test functions
-const { test } = require('@playwright/test');
-const HomePage = require('../pages/HomePage');
-const ContactUsPage = require('../pages/ContactUsPage');
+import { test, Page } from '@playwright/test';
+import { HomePage } from '../pages/HomePage';
+import { ContactUsPage } from '../pages/ContactUsPage';
 
-test.only('Test Case 6: Contact Us Form', async ({ page }) => {
+test.only('Test Case 6: Contact Us Form', async ({ page }: { page: Page }) => {
   // Give this test extra time beyond the 40s config default.
   test.setTimeout(90_000);
 
@@ -21,7 +20,12 @@ test.only('Test Case 6: Contact Us Form', async ({ page }) => {
   });
 
   await test.step("And I fill the contact form", async () => {
-    await contactUsPage.fillForm('Test User', 'test.user@example.com', 'Contact Form Subject', 'This is a test message from Playwright.');
+    await contactUsPage.fillForm(
+      'Test User',
+      'test.user@example.com',
+      'Contact Form Subject',
+      'This is a test message from Playwright.'
+    );
   });
 
   await test.step("And I upload a file", async () => {
