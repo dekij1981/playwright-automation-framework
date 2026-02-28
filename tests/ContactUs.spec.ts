@@ -2,7 +2,7 @@ import { test, Page } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { ContactUsPage } from '../pages/ContactUsPage';
 
-test.only('Test Case 6: Contact Us Form', async ({ page }: { page: Page }) => {
+test('Test Case 6: Contact Us Form', async ({ page }: { page: Page }) => {
   // Give this test extra time beyond the 40s config default.
   test.setTimeout(90_000);
 
