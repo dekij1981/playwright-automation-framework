@@ -1,61 +1,72 @@
 import { defineConfig, devices } from '@playwright/test';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ * Crucial pattern for managing multi-environment configurations and credentials safely.
+ */
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 export default defineConfig({
-  testDir: './tests',
+  // Target directory containing the refactored end-to-end test suites
+  testDir: './src/tests',
 
-  /* Parallel execution */
+  /* Run tests in files in parallel */
   fullyParallel: true,
 
-  /* Prevent test.only on CI */
+  /* Fail the build on CI if test.only was accidentally left in the source code */
   forbidOnly: !!process.env.CI,
 
-  /* Retries */
+  /* Retry on CI only (2 times), keep it 0 locally for faster feedback loops */
   retries: process.env.CI ? 2 : 0,
 
-  /* Workers */
-  workers: process.env.CI ? 1 : undefined,
+  /* Opt out of parallel tests on CI to optimize resource consumption; utilize full CPU power locally */
+  workers: process.env.CI ? 2 : undefined,
 
-  /* Reporter */
-  reporter: [['html'], ['list']],
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: [
+    ['html', { open: 'never' }],
+    ['list']
+  ],
 
-  /* Shared test settings */
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    /* Base URL to use in actions like `await page.goto('/')`. Consolidated in config to prevent UI hardcoding. */
+    baseURL: process.env.BASE_URL || 'https://automationexercise.com',
+
+    /* Run tests in headless mode (no browser GUI) to ensure maximum speed and compatibility with CI pipelines */
     headless: true,
 
-    /* Uncomment when you have env/base url */
-    // baseURL: 'http://localhost:3000',
-
-    trace: 'on-first-retry',
+    /* Production-ready anti-flakiness and debugging asset strategies */
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'on-first-retry',
+    
+    /* Suppress HTTPS certificate issues commonly found in staging/test environments */
+    ignoreHTTPSErrors: true,
   },
 
-  /* Browser projects */
+  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        // Explicitly defining viewport dimensions to enforce visual consistency across environments
+        viewport: { width: 1280, height: 720 },
       },
     },
-
-    // Enable when needed
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
+    /* Uncomment below for cross-browser test coverage when expanding the portfolio matrix
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    */
   ],
-
-  /* Optional dev server */
-  /*
-  webServer: {
-    command: 'npm run start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
-  */
 });

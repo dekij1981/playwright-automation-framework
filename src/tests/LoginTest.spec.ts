@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import {HomePage} from '../src/pages/HomePage';
-import {SignupLoginPage} from '../src/pages/SignupLoginPage';
+import { HomePage } from '../pages/HomePage';
+import { SignupLoginPage } from '../pages/SignupLoginPage';
 // Test case for user login
 
 test('Test Case 2: Login User with correct email and password', async ({ page }) => {
