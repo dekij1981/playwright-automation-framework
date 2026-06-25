@@ -1,8 +1,5 @@
 import { expect, Page, Locator } from '@playwright/test';
 
-/**
- * Page Object Model representing the Contact Us page components and form pipelines.
- */
 export class ContactUsPage {
   readonly page: Page;
   readonly contactForm: Locator;
@@ -19,34 +16,30 @@ export class ContactUsPage {
   constructor(page: Page) {
     this.page = page;
 
-    // Root container locator for the contact form layout
     this.contactForm = page.locator('#contact-page form');
 
-    // Input elements mapped securely via dedicated QA data attributes
     this.name = this.contactForm.locator('input[data-qa="name"]');
     this.email = this.contactForm.locator('input[data-qa="email"]');
     this.subject = this.contactForm.locator('input[data-qa="subject"]');
     this.message = this.contactForm.locator('textarea[data-qa="message"]');
 
-    // Control for target file attachment uploads
     this.upload = this.contactForm.locator('input[name="upload_file"]');
 
-    // FIX 1: New submit button locator to prevent getByRole timeout issues
     this.submitBtn = this.contactForm.locator('input[type="submit"]');
     this.homeBtn = page.locator('#contact-page').getByRole('link', { name: /^home$/i });
   }
 
-  /**
-   * Asserts that the endpoint state has initialized by inspecting the explicit routing URL and layout container.
-   */
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
+
+    // Remove any leftover iframes (ads safety)
+    await this.page.evaluate(() => {
+      document.querySelectorAll('iframe').forEach(el => el.remove());
+    });
+
     await expect(this.contactForm).toBeVisible();
   }
 
-  /**
-   * Fills out the interaction inputs inside the contact wrapper layer and runs data integrity checks.
-   */
   async fillForm(
     name: string,
     email: string,
@@ -60,16 +53,12 @@ export class ContactUsPage {
     await this.subject.fill(subject);
     await this.message.fill(message);
 
-    // Double check state values before attempting form submission workflow paths
     await expect(this.name).toHaveValue(name);
     await expect(this.email).toHaveValue(email);
     await expect(this.subject).toHaveValue(subject);
     await expect(this.message).toHaveValue(message);
   }
 
-  /**
-   * Generates a virtual in-memory text file block and assigns it to the target attachment form input.
-   */
   async uploadFile(
     fileName = 'contact.txt',
     content = 'Attachment from Playwright Contact Us test.'
@@ -81,45 +70,47 @@ export class ContactUsPage {
     });
   }
 
-  /**
-   * Triggers form submission execution pipelines.
-   * FIX 2: Replaced the old Promise.all approach with a safer and faster dialog listener and force click
-   */
+  private async safeClick(locator: Locator): Promise<void> {
+    await locator.scrollIntoViewIfNeeded();
+    await expect(locator).toBeVisible();
+    await expect(locator).toBeEnabled();
+
+    await this.page.waitForLoadState('domcontentloaded');
+
+    await locator.click({ force: true });
+  }
+
   async submitForm(): Promise<void> {
-    await expect(this.submitBtn).toBeVisible();
-    await expect(this.submitBtn).toBeEnabled();
+    const dialogPromise = this.page
+      .waitForEvent('dialog')
+      .then(dialog => dialog.accept())
+      .catch(() => {});
 
-    // Register a one-time dialog listener right before triggering the action
-    this.page.once('dialog', async (dialog) => {
-      await dialog.accept();
-    });
+    await this.safeClick(this.submitBtn);
 
-    // Clicking with force: true bypasses potential overlay elements and ads
-    await this.submitBtn.click({ force: true });
+    await dialogPromise;
+
+    await this.page.waitForLoadState('networkidle');
   }
 
-  /**
-   * Validates backend response delivery states by verifying the visibility of the UI layout success banner.
-   */
+  async waitForSubmissionState(): Promise<void> {
+    await Promise.race([
+      this.page.waitForURL(/contact_us|success/i, { timeout: 15000 }),
+      this.page.getByText(/success.*submitted/i).waitFor({ timeout: 15000 }),
+    ]);
+  }
+
   async verifySuccessMessage(): Promise<void> {
-    const successMsg = this.page
-      .locator('.alert-success')
-      .filter({ hasText: /success.*submitted/i });
+    const successMsg = this.page.getByText(
+      /success.*submitted.*successfully/i
+    );
 
-    await expect(successMsg.first()).toBeVisible({ timeout: 20_000 });
+    await expect(successMsg).toBeVisible({ timeout: 20000 });
   }
 
-  /**
-   * Dispatches navigation clicks to return users safely to the main landing dashboard overview.
-   * Handles optional Google Interstitial Ads by forcing a direct navigation if stuck.
-   */
   async clickHomeButton(): Promise<void> {
-    await expect(this.homeBtn).toBeVisible();
-    
-    // FIX: Removed the duplicate 'this.' that caused the compiler error
-    await this.homeBtn.click();
+    await this.safeClick(this.homeBtn);
 
-    // Fallback: If an overlay ad intercepts the action, programmatically force the correct URL
     const currentUrl = this.page.url();
     if (currentUrl.includes('google_vignette') || currentUrl.includes('contact_us')) {
       await this.page.goto('https://automationexercise.com/');

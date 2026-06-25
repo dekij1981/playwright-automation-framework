@@ -3,15 +3,14 @@ import { test } from '@fixtures/page-objects';
 test.describe('Contact Us Form E2E Workflows', () => {
 
   test('Test Case 6: Submit Contact Us Form successfully', async ({ homePage, contactUsPage }) => {
-    
+
     await test.step('Given I navigate to the home page', async () => {
       await homePage.navigateToHome();
       await homePage.verifyTitle();
     });
 
     await test.step('When I navigate onto the Contact Us layout page', async () => {
-      // FIX: Changed from clickSignupLogin() to clickContactUs() to navigate to the correct page
-      await homePage.clickContactUs(); 
+      await homePage.clickContactUs();
       await contactUsPage.verifyPageLoaded();
     });
 
@@ -25,19 +24,24 @@ test.describe('Contact Us Form E2E Workflows', () => {
     });
 
     await test.step('And I append a text attachment to the form payload', async () => {
-      await contactUsPage.uploadFile('qa_report.txt', 'Verified by automated Playwright runner process.');
+      await contactUsPage.uploadFile(
+        'qa_report.txt',
+        'Verified by automated Playwright runner process.'
+      );
     });
 
-    await test.step('When I click the submit trigger button and confirm the alert', async () => {
+    await test.step('When I submit the form and confirm alert', async () => {
       await contactUsPage.submitForm();
     });
 
-    await test.step('Then I should verify that the form successfully processed submission', async () => {
+    await test.step('Then I verify successful submission', async () => {
+      await contactUsPage.waitForSubmissionState(); // 🔥 ključ
       await contactUsPage.verifySuccessMessage();
     });
 
-    await test.step('And I safely route back to the landing dashboard viewport area', async () => {
+    await test.step('And I navigate back to home page', async () => {
       await contactUsPage.clickHomeButton();
+      await contactUsPage.page.waitForLoadState('domcontentloaded'); // 🔥 stabilizacija
       await homePage.verifyTitle();
     });
   });
