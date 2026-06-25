@@ -2,8 +2,8 @@ import { expect, Page, Locator } from '@playwright/test';
 
 export class ContactUsPage {
   readonly page: Page;
-  readonly contactForm: Locator;
 
+  readonly contactForm: Locator;
   readonly name: Locator;
   readonly email: Locator;
   readonly subject: Locator;
@@ -25,11 +25,11 @@ export class ContactUsPage {
     this.upload = this.contactForm.locator('input[name="upload_file"]');
     this.submitBtn = this.contactForm.locator('input[type="submit"]');
 
-    this.homeBtn = this.page.locator('#contact-page a[href="/"]');
+    this.homeBtn = page.locator('#contact-page a[href="/"]');
   }
 
   // -------------------------
-  // NAVIGATION / STATE
+  // NAV
   // -------------------------
 
   async verifyPageLoaded(): Promise<void> {
@@ -53,10 +53,7 @@ export class ContactUsPage {
     await this.message.fill(message);
   }
 
-  async uploadFile(
-    fileName = 'contact.txt',
-    content = 'Attachment from Playwright test'
-  ): Promise<void> {
+  async uploadFile(fileName: string, content: string): Promise<void> {
     await this.upload.setInputFiles({
       name: fileName,
       mimeType: 'text/plain',
@@ -64,29 +61,31 @@ export class ContactUsPage {
     });
   }
 
+  // -------------------------
+  // STABLE SUBMIT (IMPORTANT FIX)
+  // -------------------------
+
   async submitForm(): Promise<void> {
-    // handle browser alert safely
-    this.page.once('dialog', async dialog => {
-      await dialog.accept();
-    });
+    const dialogPromise = this.page.waitForEvent('dialog');
 
     await this.submitBtn.click();
+
+    const dialog = await dialogPromise;
+
+    // strict validation (prevents silent failure)
+    await expect(dialog.message().toLowerCase()).toContain('success');
+
+    await dialog.accept();
+
+    // 🔥 HARD SYNC POINT (CI STABILITY CRITICAL)
+    await this.page.waitForLoadState('domcontentloaded');
+
+    // ensure form still exists OR page didn't break
+    await expect(this.contactForm).toBeVisible();
   }
 
   async clickHomeButton(): Promise<void> {
     await this.homeBtn.click();
     await expect(this.page).toHaveURL('/');
-  }
-
-  // -------------------------
-  // ASSERTIONS
-  // -------------------------
-
-  async verifySuccessMessage(): Promise<void> {
-    const successMsg = this.page
-      .locator('#contact-page')
-      .getByText(/success.*submitted.*successfully/i);
-
-    await expect(successMsg).toBeVisible();
   }
 }
