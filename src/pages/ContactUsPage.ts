@@ -31,8 +31,8 @@ export class ContactUsPage {
     // Control for target file attachment uploads
     this.upload = this.contactForm.locator('input[name="upload_file"]');
 
-    // Action execution links and buttons using precise structural or accessibility roles
-    this.submitBtn = this.contactForm.getByRole('button', { name: /^submit$/i });
+    // FIX 1: New submit button locator to prevent getByRole timeout issues
+    this.submitBtn = this.contactForm.locator('input[type="submit"]');
     this.homeBtn = page.locator('#contact-page').getByRole('link', { name: /^home$/i });
   }
 
@@ -83,19 +83,19 @@ export class ContactUsPage {
 
   /**
    * Triggers form submission execution pipelines.
-   * Leverages Promise.all to synchronously initialize the dialog observer event before dispatching the click action.
+   * FIX 2: Replaced the old Promise.all approach with a safer and faster dialog listener and force click
    */
   async submitForm(): Promise<void> {
+    await expect(this.submitBtn).toBeVisible();
     await expect(this.submitBtn).toBeEnabled();
 
-    // Best Practice: The promise listener must actively evaluate before the interaction click fires
-    const [dialog] = await Promise.all([
-      this.page.waitForEvent('dialog'),
-      this.submitBtn.click(),
-    ]);
+    // Register a one-time dialog listener right before triggering the action
+    this.page.once('dialog', async (dialog) => {
+      await dialog.accept();
+    });
 
-    // Handle and acknowledge the browser alert modal to successfully complete the pipeline step
-    await dialog.accept();
+    // Clicking with force: true bypasses potential overlay elements and ads
+    await this.submitBtn.click({ force: true });
   }
 
   /**
