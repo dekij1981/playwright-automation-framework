@@ -1,10 +1,9 @@
 import { test as base, expect, Page } from '@playwright/test';
-import { HomePage } from '@pages/HomePage';
-import { SignupLoginPage } from '@pages/SignupLoginPage';
-import { ContactUsPage } from '@pages/ContactUsPage';
-import { AccountInfoPage } from '@pages/AccountInfoPage';
+import { HomePage } from '../pages/HomePage';
+import { SignupLoginPage } from '../pages/SignupLoginPage';
+import { ContactUsPage } from '../pages/ContactUsPage';
+import { AccountInfoPage } from '../pages/AccountInfoPage';
 
-// 1. Definisanje tipova za custom page fixtures za punu IDE autokompleciju
 type MyPageFixtures = {
   homePage: HomePage;
   signupLoginPage: SignupLoginPage;
@@ -12,21 +11,30 @@ type MyPageFixtures = {
   accountInfoPage: AccountInfoPage;
 };
 
-/**
- * 2. Proširivanje baznog Playwright testa.
- * Implementira Dependency Injection pattern - klase se instanciraju tek kada ih test zatraži.
- */
 export const test = base.extend<MyPageFixtures>({
-  homePage: async ({ page }: { page: Page }, use: (r: HomePage) => Promise<void>) => {
+  // Intercept the page instance to route out ad domains safely before injecting the page models
+  page: async ({ page }, use) => {
+    await page.route('**/*.{js,html}*', (route) => {
+      const url = route.request().url();
+      if (url.includes('googleads') || url.includes('doubleclick') || url.includes('adservice')) {
+        route.abort();
+      } else {
+        route.continue();
+      }
+    });
+    await use(page);
+  },
+
+  homePage: async ({ page }, use) => {
     await use(new HomePage(page));
   },
-  signupLoginPage: async ({ page }: { page: Page }, use: (r: SignupLoginPage) => Promise<void>) => {
+  signupLoginPage: async ({ page }, use) => {
     await use(new SignupLoginPage(page));
   },
-  contactUsPage: async ({ page }: { page: Page }, use: (r: ContactUsPage) => Promise<void>) => {
+  contactUsPage: async ({ page }, use) => {
     await use(new ContactUsPage(page));
   },
-  accountInfoPage: async ({ page }: { page: Page }, use: (r: AccountInfoPage) => Promise<void>) => {
+  accountInfoPage: async ({ page }, use) => {
     await use(new AccountInfoPage(page));
   },
 });
