@@ -15,7 +15,7 @@ export class ContactUsPage {
   constructor(page: Page) {
     this.page = page;
 
-    this.contactForm = page.locator('#contact-page form');
+    this.contactForm = page.locator('#contact-us-form');
 
     this.name = this.contactForm.locator('input[data-qa="name"]');
     this.email = this.contactForm.locator('input[data-qa="email"]');
@@ -23,9 +23,10 @@ export class ContactUsPage {
     this.message = this.contactForm.locator('textarea[data-qa="message"]');
 
     this.upload = this.contactForm.locator('input[name="upload_file"]');
-    this.submitBtn = this.contactForm.locator('input[type="submit"]');
+    this.submitBtn = this.contactForm.locator('input[data-qa="submit-button"]');
 
-    this.homeBtn = page.locator('#contact-page a[href="/"]');
+    // FIX: Home link is in header, NOT inside form
+    this.homeBtn = page.getByRole('link', { name: /home/i });
   }
 
   // -------------------------
@@ -35,18 +36,6 @@ export class ContactUsPage {
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
     await expect(this.contactForm).toBeVisible();
-  }
-
-  async clickHomeButton(): Promise<void> {
-    const homeLink = this.page.locator('#contact-page a[href="/"]');
-
-    await expect(homeLink).toBeVisible({ timeout: 10000 });
-    await expect(homeLink).toBeEnabled();
-
-    await homeLink.scrollIntoViewIfNeeded();
-    await homeLink.click();
-
-    await expect(this.page).toHaveURL('/');
   }
 
   // -------------------------
@@ -78,6 +67,19 @@ export class ContactUsPage {
     await expect(this.submitBtn).toBeEnabled();
 
     await this.submitBtn.click();
-    await expect(this.contactForm).toBeVisible();
+
+    // UI stabilisation (no fake dialog / no fake waits)
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  // -------------------------
+  // NAVIGATION ACTION
+  // -------------------------
+
+  async clickHomeButton(): Promise<void> {
+    await expect(this.homeBtn).toBeVisible({ timeout: 10000 });
+    await this.homeBtn.click();
+
+    await expect(this.page).toHaveURL('/');
   }
 }
