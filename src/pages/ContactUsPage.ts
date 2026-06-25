@@ -38,7 +38,14 @@ export class ContactUsPage {
   }
 
   async clickHomeButton(): Promise<void> {
-    await this.homeBtn.click();
+    const homeLink = this.page.locator('#contact-page a[href="/"]');
+
+    await expect(homeLink).toBeVisible({ timeout: 10000 });
+    await expect(homeLink).toBeEnabled();
+
+    await homeLink.scrollIntoViewIfNeeded();
+    await homeLink.click();
+
     await expect(this.page).toHaveURL('/');
   }
 
@@ -67,13 +74,12 @@ export class ContactUsPage {
   }
 
   async submitForm(): Promise<void> {
-    // click submit (no dialog exists in this app)
+    await expect(this.submitBtn).toBeVisible();
+    await expect(this.submitBtn).toBeEnabled();
+
     await this.submitBtn.click();
 
-    // stabilize page after submit
-    await this.page.waitForLoadState('domcontentloaded');
-
-    // sanity check: form still exists
+    // stabilizacija nakon submit-a
     await expect(this.contactForm).toBeVisible();
   }
 }
