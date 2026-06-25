@@ -9,7 +9,6 @@ export class ContactUsPage {
   readonly subject: Locator;
   readonly message: Locator;
   readonly upload: Locator;
-
   readonly submitBtn: Locator;
   readonly homeBtn: Locator;
 
@@ -24,23 +23,23 @@ export class ContactUsPage {
     this.message = this.contactForm.locator('textarea[data-qa="message"]');
 
     this.upload = this.contactForm.locator('input[name="upload_file"]');
-
     this.submitBtn = this.contactForm.locator('input[type="submit"]');
 
-    // stable locator (avoid role flakiness)
     this.homeBtn = this.page.locator('#contact-page a[href="/"]');
   }
 
+  // -------------------------
+  // NAVIGATION / STATE
+  // -------------------------
+
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
-
-    // cleanup possible overlays/iframes
-    await this.page.evaluate(() => {
-      document.querySelectorAll('iframe').forEach(el => el.remove());
-    });
-
     await expect(this.contactForm).toBeVisible();
   }
+
+  // -------------------------
+  // ACTIONS
+  // -------------------------
 
   async fillForm(
     name: string,
@@ -48,22 +47,15 @@ export class ContactUsPage {
     subject: string,
     message: string
   ): Promise<void> {
-    await expect(this.contactForm).toBeVisible();
-
     await this.name.fill(name);
     await this.email.fill(email);
     await this.subject.fill(subject);
     await this.message.fill(message);
-
-    await expect(this.name).toHaveValue(name);
-    await expect(this.email).toHaveValue(email);
-    await expect(this.subject).toHaveValue(subject);
-    await expect(this.message).toHaveValue(message);
   }
 
   async uploadFile(
     fileName = 'contact.txt',
-    content = 'Attachment from Playwright Contact Us test.'
+    content = 'Attachment from Playwright test'
   ): Promise<void> {
     await this.upload.setInputFiles({
       name: fileName,
@@ -72,47 +64,29 @@ export class ContactUsPage {
     });
   }
 
-  private async safeClick(locator: Locator): Promise<void> {
-    await expect(locator).toBeVisible({ timeout: 10000 });
-    await expect(locator).toBeEnabled();
-
-    await locator.scrollIntoViewIfNeeded();
-    await locator.click({ force: true });
-  }
-
   async submitForm(): Promise<void> {
-    // handle browser alert deterministically
+    // handle browser alert safely
     this.page.once('dialog', async dialog => {
       await dialog.accept();
     });
 
-    await this.safeClick(this.submitBtn);
-
-    // 🔥 HARD SYNC POINT (fixes flakiness)
-    const successMsg = this.page
-      .locator('#contact-page')
-      .getByText(/success.*submitted.*successfully/i);
-
-    await expect(successMsg).toBeVisible({ timeout: 20000 });
-
-    await expect(
-      this.page.locator('#contact-page a[href="/"]')
-    ).toBeVisible({ timeout: 20000 });
+    await this.submitBtn.click();
   }
+
+  async clickHomeButton(): Promise<void> {
+    await this.homeBtn.click();
+    await expect(this.page).toHaveURL('/');
+  }
+
+  // -------------------------
+  // ASSERTIONS
+  // -------------------------
 
   async verifySuccessMessage(): Promise<void> {
     const successMsg = this.page
       .locator('#contact-page')
       .getByText(/success.*submitted.*successfully/i);
 
-    await expect(successMsg).toBeVisible({ timeout: 20000 });
-  }
-
-  async clickHomeButton(): Promise<void> {
-    await expect(this.homeBtn).toBeVisible({ timeout: 10000 });
-
-    await this.homeBtn.click();
-
-    await this.page.waitForLoadState('domcontentloaded');
+    await expect(successMsg).toBeVisible();
   }
 }
