@@ -32,7 +32,7 @@ export class ContactUsPage {
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
 
-    // Remove any leftover iframes (ads safety)
+    // safety: remove leftover ads if present
     await this.page.evaluate(() => {
       document.querySelectorAll('iframe').forEach(el => el.remove());
     });
@@ -101,9 +101,9 @@ export class ContactUsPage {
   }
 
   async verifySuccessMessage(): Promise<void> {
-    const successMsg = this.page.getByText(
-      /success.*submitted.*successfully/i
-    );
+    const successMsg = this.page
+      .locator('#contact-page')
+      .getByText(/success.*submitted.*successfully/i);
 
     await expect(successMsg).toBeVisible({ timeout: 20000 });
   }
@@ -112,7 +112,10 @@ export class ContactUsPage {
     await this.safeClick(this.homeBtn);
 
     const currentUrl = this.page.url();
-    if (currentUrl.includes('google_vignette') || currentUrl.includes('contact_us')) {
+    if (
+      currentUrl.includes('google_vignette') ||
+      currentUrl.includes('contact_us')
+    ) {
       await this.page.goto('https://automationexercise.com/');
     }
   }
