@@ -78,8 +78,6 @@ export class ContactUsPage {
     await expect(this.submitBtn).toBeEnabled();
 
     await this.submitBtn.click();
-
-    // stabilizacija nakon submit-a
     await expect(this.contactForm).toBeVisible();
   }
 }
