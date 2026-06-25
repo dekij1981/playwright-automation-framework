@@ -27,13 +27,14 @@ export class ContactUsPage {
 
     this.submitBtn = this.contactForm.locator('input[type="submit"]');
 
-    // ⚠️ bolje stabilan selector nego role (role puca na re-renderu)
+    // stable locator (avoid role flakiness)
     this.homeBtn = this.page.locator('#contact-page a[href="/"]');
   }
 
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
 
+    // cleanup possible overlays/iframes
     await this.page.evaluate(() => {
       document.querySelectorAll('iframe').forEach(el => el.remove());
     });
@@ -76,28 +77,27 @@ export class ContactUsPage {
     await expect(locator).toBeEnabled();
 
     await locator.scrollIntoViewIfNeeded();
-
     await locator.click({ force: true });
   }
 
   async submitForm(): Promise<void> {
-    const dialogPromise = this.page
-      .waitForEvent('dialog')
-      .then(d => d.accept())
-      .catch(() => {});
+    // handle browser alert deterministically
+    this.page.once('dialog', async dialog => {
+      await dialog.accept();
+    });
 
     await this.safeClick(this.submitBtn);
 
-    await dialogPromise;
+    // 🔥 HARD SYNC POINT (fixes flakiness)
+    const successMsg = this.page
+      .locator('#contact-page')
+      .getByText(/success.*submitted.*successfully/i);
 
-    await this.page.waitForLoadState('networkidle');
-  }
+    await expect(successMsg).toBeVisible({ timeout: 20000 });
 
-  async waitForSubmissionState(): Promise<void> {
-    await Promise.race([
-      this.page.waitForURL(/contact_us|success/i, { timeout: 15000 }),
-      this.page.getByText(/success.*submitted/i).waitFor({ timeout: 15000 }),
-    ]);
+    await expect(
+      this.page.locator('#contact-page a[href="/"]')
+    ).toBeVisible({ timeout: 20000 });
   }
 
   async verifySuccessMessage(): Promise<void> {
@@ -109,9 +109,6 @@ export class ContactUsPage {
   }
 
   async clickHomeButton(): Promise<void> {
-    // 🔥 wait for post-submit UI stabilization
-    await this.page.waitForTimeout(500);
-
     await expect(this.homeBtn).toBeVisible({ timeout: 10000 });
 
     await this.homeBtn.click();
