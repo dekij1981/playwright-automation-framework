@@ -29,12 +29,17 @@ export class ContactUsPage {
   }
 
   // -------------------------
-  // NAV
+  // NAVIGATION
   // -------------------------
 
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
     await expect(this.contactForm).toBeVisible();
+  }
+
+  async clickHomeButton(): Promise<void> {
+    await this.homeBtn.click();
+    await expect(this.page).toHaveURL('/');
   }
 
   // -------------------------
@@ -61,33 +66,14 @@ export class ContactUsPage {
     });
   }
 
-  // -------------------------
-  // FIXED STABLE SUBMIT (CI SAFE)
-  // -------------------------
-
   async submitForm(): Promise<void> {
-    // Stable dialog handling (NO TIMEOUT RACE CONDITION)
-    const dialogPromise = this.page.waitForEvent('dialog', { timeout: 10000 });
-
+    // click submit (no dialog exists in this app)
     await this.submitBtn.click();
 
-    const dialog = await dialogPromise;
-
-    await dialog.accept();
-
-    // ensure page is stable after alert
+    // stabilize page after submit
     await this.page.waitForLoadState('domcontentloaded');
 
-    // sanity check - form still exists
+    // sanity check: form still exists
     await expect(this.contactForm).toBeVisible();
-  }
-
-  // -------------------------
-  // NAVIGATION
-  // -------------------------
-
-  async clickHomeButton(): Promise<void> {
-    await this.homeBtn.click();
-    await expect(this.page).toHaveURL('/');
   }
 }
