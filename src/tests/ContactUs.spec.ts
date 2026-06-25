@@ -10,6 +10,7 @@ test.describe('Contact Us Form E2E Workflows', () => {
     });
 
     await test.step('When I navigate onto the Contact Us layout page', async () => {
+      // FIX: Changed from clickSignupLogin() to clickContactUs() to navigate to the correct page
       await homePage.clickContactUs(); 
       await contactUsPage.verifyPageLoaded();
     });
