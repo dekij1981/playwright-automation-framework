@@ -26,13 +26,14 @@ export class ContactUsPage {
     this.upload = this.contactForm.locator('input[name="upload_file"]');
 
     this.submitBtn = this.contactForm.locator('input[type="submit"]');
-    this.homeBtn = page.locator('#contact-page').getByRole('link', { name: /^home$/i });
+
+    // ⚠️ bolje stabilan selector nego role (role puca na re-renderu)
+    this.homeBtn = this.page.locator('#contact-page a[href="/"]');
   }
 
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
 
-    // safety: remove leftover ads if present
     await this.page.evaluate(() => {
       document.querySelectorAll('iframe').forEach(el => el.remove());
     });
@@ -71,11 +72,10 @@ export class ContactUsPage {
   }
 
   private async safeClick(locator: Locator): Promise<void> {
-    await locator.scrollIntoViewIfNeeded();
-    await expect(locator).toBeVisible();
+    await expect(locator).toBeVisible({ timeout: 10000 });
     await expect(locator).toBeEnabled();
 
-    await this.page.waitForLoadState('domcontentloaded');
+    await locator.scrollIntoViewIfNeeded();
 
     await locator.click({ force: true });
   }
@@ -83,7 +83,7 @@ export class ContactUsPage {
   async submitForm(): Promise<void> {
     const dialogPromise = this.page
       .waitForEvent('dialog')
-      .then(dialog => dialog.accept())
+      .then(d => d.accept())
       .catch(() => {});
 
     await this.safeClick(this.submitBtn);
@@ -109,14 +109,13 @@ export class ContactUsPage {
   }
 
   async clickHomeButton(): Promise<void> {
-    await this.safeClick(this.homeBtn);
+    // 🔥 wait for post-submit UI stabilization
+    await this.page.waitForTimeout(500);
 
-    const currentUrl = this.page.url();
-    if (
-      currentUrl.includes('google_vignette') ||
-      currentUrl.includes('contact_us')
-    ) {
-      await this.page.goto('https://automationexercise.com/');
-    }
+    await expect(this.homeBtn).toBeVisible({ timeout: 10000 });
+
+    await this.homeBtn.click();
+
+    await this.page.waitForLoadState('domcontentloaded');
   }
 }
