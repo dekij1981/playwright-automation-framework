@@ -1,17 +1,25 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-
     "module": "Node16",
     "moduleResolution": "node16",
-
     "strict": true,
     "esModuleInterop": true,
-
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-
     "resolveJsonModule": true,
+    
+    /* Silence the TypeScript 5.x+ baseUrl deprecation warning */
+    "ignoreDeprecations": "6.0",
+    
+    /* Absolute path mapping setup */
+    "baseUrl": ".",
+    "paths": {
+      "@pages/*": ["src/pages/*"],
+      "@fixtures/*": ["src/fixtures/*"],
+      "@utils/*": ["src/utils/*"],
+      "@data/*": ["src/data/*"]
+    },
 
     "types": [
       "@playwright/test",
@@ -19,7 +27,7 @@
     ]
   },
   "include": [
-    "tests/**/*.ts",
+    "src/**/*.ts",
     "playwright.config.ts"
   ]
 }

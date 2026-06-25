@@ -1,58 +1,54 @@
-import { test } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { SignupLoginPage } from '../pages/SignupLoginPage';
-// Test case for user login
+import { test } from '@fixtures/page-objects';
 
-test('Test Case 2: Login User with correct email and password', async ({ page }) => {
-  const homePage = new HomePage(page);
-  const signupLoginPage = new SignupLoginPage(page);
+test.describe('User Authentication Workflows', () => {
 
-  await test.step('Given I am on the home page', async () => {
-    await homePage.navigateToHome();
-    await homePage.verifyTitle();
+  test('Test Case 2: Login User with correct email and password', async ({ homePage, signupLoginPage }) => {
+    // The 'homePage' and 'signupLoginPage' are automatically injected via custom fixtures
+
+    await test.step('Given I am on the home page', async () => {
+      await homePage.navigateToHome();
+      await homePage.verifyTitle();
+    });
+
+    await test.step('When I click on Signup / Login button', async () => {
+      await homePage.clickSignupLogin();
+    });
+
+    await test.step('Then the login section is visible', async () => {
+      await signupLoginPage.verifyLoginSection();
+    });
+
+    await test.step('When I enter correct email and password and login', async () => {
+      await signupLoginPage.login('test1112226@yopmail.com', 'Password123!');
+    });
+
+    await test.step('Then I should be logged in as username', async () => {
+      await signupLoginPage.verifyLoggedIn('Test');
+    });
   });
 
-  await test.step('When I click on Signup / Login button', async () => {
-    await homePage.clickSignupLogin();
-  });
+  test('Test Case 3: Login User with incorrect email and password', async ({ homePage, signupLoginPage }) => {
+    // Reusing the same injected page instances for separate test evaluation
 
-  await test.step('Then the login section is visible', async () => {
-    await signupLoginPage.verifyLoginSection();
-  });
+    await test.step('Given I am on the home page', async () => {
+      await homePage.navigateToHome();
+      await homePage.verifyTitle();
+    });
 
-  await test.step('When I enter correct email and password and login', async () => {
-    await signupLoginPage.login('test1112226@yopmail.com', 'Password123!');
-  });
+    await test.step('When I click on Signup / Login button', async () => {
+      await homePage.clickSignupLogin();
+    });
 
-  await test.step('Then I should be logged in as username', async () => {
-    await signupLoginPage.verifyLoggedIn('Test');
-  });
-});
+    await test.step('Then the login section is visible', async () => {
+      await signupLoginPage.verifyLoginSection();
+    });
 
-// Test case for user login with incorrect credentials
+    await test.step('When I enter incorrect email and password and login', async () => {
+      await signupLoginPage.login('incorrect@example.com', 'WrongPassword');
+    });
 
-test('Test Case 3: Login User with incorrect email and password', async ({ page }) => {
-  const homePage = new HomePage(page);
-  const signupLoginPage = new SignupLoginPage(page);
-
-  await test.step('Given I am on the home page', async () => {
-    await homePage.navigateToHome();
-    await homePage.verifyTitle();
-  });
-
-  await test.step('When I click on Signup / Login button', async () => {
-    await homePage.clickSignupLogin();
-  });
-
-  await test.step('Then the login section is visible', async () => {
-    await signupLoginPage.verifyLoginSection();
-  });
-
-  await test.step('When I enter incorrect email and password and login', async () => {
-    await signupLoginPage.login('incorrect@example.com', 'WrongPassword');
-  });
-
-  await test.step('Then I should see login error message', async () => {
-    await signupLoginPage.verifyLoginError();
+    await test.step('Then I should see login error message', async () => {
+      await signupLoginPage.verifyLoginError();
+    });
   });
 });
