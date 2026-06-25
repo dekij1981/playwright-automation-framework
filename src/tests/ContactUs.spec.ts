@@ -10,8 +10,7 @@ test.describe('Contact Us Form E2E Workflows', () => {
     });
 
     await test.step('When I navigate onto the Contact Us layout page', async () => {
-      // Assuming clickSignupLogin or similar logic triggers navigation or directly routing via link
-      await homePage.clickSignupLogin(); 
+      await homePage.clickContactUs(); 
       await contactUsPage.verifyPageLoaded();
     });
 
