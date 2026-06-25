@@ -1,10 +1,10 @@
 import { test as base, expect, Page } from '@playwright/test';
-import { HomePage } from '../pages/HomePage';
-import { SignupLoginPage } from '../pages/SignupLoginPage';
-import { ContactUsPage } from '../pages/ContactUsPage';
-import { AccountInfoPage } from '../pages/AccountInfoPage';
+import { HomePage } from '@pages/HomePage';
+import { SignupLoginPage } from '@pages/SignupLoginPage';
+import { ContactUsPage } from '@pages/ContactUsPage';
+import { AccountInfoPage } from '@pages/AccountInfoPage';
 
-// 1. Define the types for our custom page fixtures for full IDE autocompletion
+// 1. Definisanje tipova za custom page fixtures za punu IDE autokompleciju
 type MyPageFixtures = {
   homePage: HomePage;
   signupLoginPage: SignupLoginPage;
@@ -13,9 +13,8 @@ type MyPageFixtures = {
 };
 
 /**
- * 2. Extend the base Playwright test to include our customized Page Objects.
- * This implements the Dependency Injection pattern, ensuring that page classes
- * are only instantiated lazily when requested by a specific test block.
+ * 2. Proširivanje baznog Playwright testa.
+ * Implementira Dependency Injection pattern - klase se instanciraju tek kada ih test zatraži.
  */
 export const test = base.extend<MyPageFixtures>({
   homePage: async ({ page }: { page: Page }, use: (r: HomePage) => Promise<void>) => {
@@ -32,5 +31,4 @@ export const test = base.extend<MyPageFixtures>({
   },
 });
 
-// Re-export the expect utility so tests can import everything from this single file
 export { expect };

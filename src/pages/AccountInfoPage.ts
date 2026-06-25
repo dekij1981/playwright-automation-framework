@@ -1,8 +1,7 @@
-import { expect, Page, Locator } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 /**
  * Page Object Model for the Account Information Page.
- * All methods are typed and leverage Playwright's strong typing support.
  */
 export class AccountInfoPage {
   private page: Page;
@@ -15,19 +14,15 @@ export class AccountInfoPage {
     await expect(this.page.locator('text=ENTER ACCOUNT INFORMATION')).toBeVisible();
   }
 
-  async fillAccountDetails(name: string, email: string, password: string): Promise<void> {
-    // Assuming name and email are pre-filled, but to be safe, fill them
-    await this.page.fill('input[data-qa="signup-name"]', name);
-    await this.page.fill('input[data-qa="signup-email"]', email);
-    await this.page.click('button[data-qa="signup-button"]');
-
-    // Now fill account info
+  async fillAccountDetails(password: string): Promise<void> {
+    // Selektovanje titule, lozinke i datuma rođenja
     await this.page.check('input[value="Mr"]');
     await this.page.fill('input[name="password"]', password);
     await this.page.selectOption('select[name="days"]', '1');
     await this.page.selectOption('select[name="months"]', 'January');
     await this.page.selectOption('select[name="years"]', '1990');
 
+    // Newsletter i ponude
     await this.page.check('input[name="newsletter"]');
     await this.page.check('input[name="optin"]');
   }
@@ -76,5 +71,3 @@ export class AccountInfoPage {
     await expect(this.page.locator('text=ACCOUNT DELETED!')).toBeVisible();
   }
 }
-
-// No module.exports; use ES module export
