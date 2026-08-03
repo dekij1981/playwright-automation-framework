@@ -1,12 +1,7 @@
 import { test } from '@fixtures/page-objects';
 
 test.describe('Contact Us Form E2E Workflows', () => {
-
-  test('Test Case 6: Submit Contact Us Form successfully', async ({
-    homePage,
-    contactUsPage
-  }) => {
-
+  test('Test Case 6: Submit Contact Us Form successfully', async ({ homePage, contactUsPage }) => {
     await test.step('Navigate to home page', async () => {
       await homePage.navigateToHome();
       await homePage.verifyTitle();
@@ -22,15 +17,12 @@ test.describe('Contact Us Form E2E Workflows', () => {
         'Dejan QA',
         'dejan.test@example.com',
         'Automation Inquiry',
-        'Stable CI test message'
+        'Stable CI test message',
       );
     });
 
     await test.step('Upload file', async () => {
-      await contactUsPage.uploadFile(
-        'qa_report.txt',
-        'Playwright CI-safe attachment'
-      );
+      await contactUsPage.uploadFile('qa_report.txt', 'Playwright CI-safe attachment');
     });
 
     await test.step('Submit form', async () => {

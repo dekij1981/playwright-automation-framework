@@ -26,10 +26,7 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
 
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list']
-  ],
+  reporter: [['html', { open: 'never' }], ['list']],
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -43,7 +40,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
-    
+
     /* Suppress HTTPS certificate issues commonly found in staging/test environments */
     ignoreHTTPSErrors: true,
   },

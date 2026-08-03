@@ -11,7 +11,7 @@ export class SignupLoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    
+
     // Scoped section containers to isolate elements and prevent form target overlapping
     this.loginForm = page.locator('.login-form');
     this.signupForm = page.locator('.signup-form');
@@ -50,7 +50,9 @@ export class SignupLoginPage {
    * Validates authentication failure boundaries by expecting error banner feedback structures.
    */
   async verifyLoginError(): Promise<void> {
-    await expect(this.page.locator('text=Your email or password is incorrect!')).toBeVisible({ timeout: 120000 });
+    await expect(this.page.locator('text=Your email or password is incorrect!')).toBeVisible({
+      timeout: 120000,
+    });
   }
 
   // ==========================================

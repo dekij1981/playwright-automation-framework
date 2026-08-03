@@ -10,8 +10,11 @@ function generateUniqueUser(): UniqueUser {
 }
 
 test.describe('User Registration Workflows', () => {
-
-  test('Test Case 1: Register User successfully', async ({ homePage, signupLoginPage, accountInfoPage }) => {
+  test('Test Case 1: Register User successfully', async ({
+    homePage,
+    signupLoginPage,
+    accountInfoPage,
+  }) => {
     const { uniqueName, uniqueEmail } = generateUniqueUser();
 
     await test.step('Given I am on the home page', async () => {
@@ -50,7 +53,7 @@ test.describe('User Registration Workflows', () => {
         'Test State',
         'Test City',
         '12345',
-        '1234567890'
+        '1234567890',
       );
     });
 

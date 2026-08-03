@@ -1,29 +1,34 @@
 {
   "name": "playwright-typescript-automation-framework",
   "version": "1.0.0",
-  "description": "Portfolio test automation framework built with Playwright and TypeScript.",
-  "main": "index.js",
-  "devDependencies": {
-    "@playwright/test": "^1.56.1",
-    "@types/node": "^24.13.2",
-    "dotenv": "^17.4.2",
-    "typescript": "^5.9.3"
-  },
+  "description": "Production-style Playwright and TypeScript automation framework demonstrating maintainable UI, API and end-to-end testing practices.",
+  "private": true,
+  "author": "Dejan Jovanovic",
+  "license": "MIT",
+  "keywords": [
+    "playwright",
+    "typescript",
+    "qa-automation",
+    "e2e-testing",
+    "api-testing",
+    "quality-engineering",
+    "playwright-framework"
+  ],
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
     "report": "playwright show-report",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
-  "keywords": [
-    "playwright",
-    "typescript",
-    "automation",
-    "qa",
-    "e2e"
-  ],
-  "author": "Dejan Jovanovic",
-  "license": "MIT"
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.13.2",
+    "dotenv": "^17.4.2",
+    "prettier": "^3.9.6",
+    "typescript": "^5.9.3"
+  }
 }

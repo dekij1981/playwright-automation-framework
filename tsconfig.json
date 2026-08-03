@@ -17,13 +17,7 @@
       "@data/*": ["src/data/*"]
     },
 
-    "types": [
-      "@playwright/test",
-      "node"
-    ]
+    "types": ["@playwright/test", "node"]
   },
-  "include": [
-    "src/**/*.ts",
-    "playwright.config.ts"
-  ]
+  "include": ["src/**/*.ts", "playwright.config.ts"]
 }

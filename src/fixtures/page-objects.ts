@@ -13,7 +13,6 @@ type MyPageFixtures = {
 
 export const test = base.extend<MyPageFixtures>({
   page: async ({ page }, use) => {
-
     const blockedDomains = [
       'googlesyndication',
       'doubleclick',
@@ -28,7 +27,7 @@ export const test = base.extend<MyPageFixtures>({
     await page.route('**/*', (route) => {
       const url = route.request().url();
 
-      if (blockedDomains.some(domain => url.includes(domain))) {
+      if (blockedDomains.some((domain) => url.includes(domain))) {
         return route.abort();
       }
 
@@ -39,11 +38,7 @@ export const test = base.extend<MyPageFixtures>({
       const removeAds = () => {
         document.querySelectorAll('iframe').forEach((el) => {
           const src = el.getAttribute('src') || '';
-          if (
-            src.includes('google') ||
-            src.includes('ads') ||
-            src.includes('doubleclick')
-          ) {
+          if (src.includes('google') || src.includes('ads') || src.includes('doubleclick')) {
             el.remove();
           }
         });

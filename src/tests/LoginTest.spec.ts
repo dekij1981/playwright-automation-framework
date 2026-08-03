@@ -1,8 +1,10 @@
 import { test } from '@fixtures/page-objects';
 
 test.describe('User Authentication Workflows', () => {
-
-  test('Test Case 2: Login User with correct email and password', async ({ homePage, signupLoginPage }) => {
+  test('Test Case 2: Login User with correct email and password', async ({
+    homePage,
+    signupLoginPage,
+  }) => {
     // The 'homePage' and 'signupLoginPage' are automatically injected via custom fixtures
 
     await test.step('Given I am on the home page', async () => {
@@ -27,7 +29,10 @@ test.describe('User Authentication Workflows', () => {
     });
   });
 
-  test('Test Case 3: Login User with incorrect email and password', async ({ homePage, signupLoginPage }) => {
+  test('Test Case 3: Login User with incorrect email and password', async ({
+    homePage,
+    signupLoginPage,
+  }) => {
     // Reusing the same injected page instances for separate test evaluation
 
     await test.step('Given I am on the home page', async () => {

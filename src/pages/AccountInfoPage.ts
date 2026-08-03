@@ -31,10 +31,10 @@ export class AccountInfoPage {
   async fillAccountDetails(password: string): Promise<void> {
     // Select radio button choice for title prefix mapping
     await this.page.check('input[value="Mr"]');
-    
+
     // Populate account security credentials
     await this.page.fill('input[name="password"]', password);
-    
+
     // Select standard dropdown fields representing the target account date of birth parameters
     await this.page.selectOption('select[name="days"]', '1');
     await this.page.selectOption('select[name="months"]', 'January');
@@ -58,7 +58,7 @@ export class AccountInfoPage {
     state: string,
     city: string,
     zipcode: string,
-    mobile: string
+    mobile: string,
   ): Promise<void> {
     await this.page.fill('input[name="first_name"]', firstName);
     await this.page.fill('input[name="last_name"]', lastName);

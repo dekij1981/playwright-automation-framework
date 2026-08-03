@@ -42,12 +42,7 @@ export class ContactUsPage {
   // ACTIONS
   // -------------------------
 
-  async fillForm(
-    name: string,
-    email: string,
-    subject: string,
-    message: string
-  ): Promise<void> {
+  async fillForm(name: string, email: string, subject: string, message: string): Promise<void> {
     await this.name.fill(name);
     await this.email.fill(email);
     await this.subject.fill(subject);
