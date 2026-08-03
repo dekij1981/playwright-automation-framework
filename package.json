@@ -1,13 +1,15 @@
 {
-  "name": "qe-learning",
+  "name": "playwright-typescript-automation-framework",
   "version": "1.0.0",
-  "description": "",
+  "description": "Portfolio test automation framework built with Playwright and TypeScript.",
   "main": "index.js",
+
   "dependencies": {
     "playwright": "^1.56.1",
     "playwright-core": "^1.56.1",
     "undici-types": "^7.16.0"
   },
+
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "@types/node": "^24.13.2",
@@ -15,8 +17,24 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
-  "scripts": {},
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+
+  "keywords": [
+    "playwright",
+    "typescript",
+    "automation",
+    "qa",
+    "e2e"
+  ],
+
+  "author": "Dejan Jovanovic",
+  "license": "MIT"
 }

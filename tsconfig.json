@@ -8,11 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    
-    /* Silence the TypeScript 5.x+ baseUrl deprecation warning */
-    "ignoreDeprecations": "6.0",
-    
-    /* Absolute path mapping setup */
+
     "baseUrl": ".",
     "paths": {
       "@pages/*": ["src/pages/*"],
