@@ -9,13 +9,17 @@ dotenv.config({
 
 const isCI = Boolean(process.env.CI);
 
+const configuredWorkers = Number(process.env.WORKERS);
+const workers =
+  Number.isInteger(configuredWorkers) && configuredWorkers > 0 ? configuredWorkers : 2;
+
 export default defineConfig({
   testDir: './src/tests',
 
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  workers: isCI ? 2 : undefined,
+  workers,
 
   reporter: [
     ['list'],

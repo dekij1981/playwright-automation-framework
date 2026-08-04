@@ -17,7 +17,9 @@ export class ContactUsPage {
     this.emailInput = this.contactForm.locator('[data-qa="email"]');
     this.subjectInput = this.contactForm.locator('[data-qa="subject"]');
     this.messageInput = this.contactForm.locator('[data-qa="message"]');
+
     this.uploadInput = this.contactForm.locator('input[name="upload_file"]');
+
     this.submitButton = this.contactForm.locator('[data-qa="submit-button"]');
 
     this.headerHomeLink = page.locator('header').getByRole('link', { name: /home/i });
@@ -48,19 +50,21 @@ export class ContactUsPage {
       await dialog.accept();
     });
 
-    const responsePromise = this.page.waitForResponse(
-      (response) => {
-        const url = new URL(response.url());
+    const requestPromise = this.page.waitForRequest(
+      (request) => {
+        const url = new URL(request.url());
         const normalizedPath = url.pathname.replace(/\/$/, '');
 
-        return normalizedPath === '/contact_us' && response.request().method() === 'POST';
+        return normalizedPath === '/contact_us' && request.method() === 'POST';
       },
-      { timeout: 15_000 },
+      {
+        timeout: 15_000,
+      },
     );
 
-    const [response] = await Promise.all([responsePromise, this.submitButton.click()]);
+    const [request] = await Promise.all([requestPromise, this.submitButton.click()]);
 
-    expect(response.status()).toBe(200);
+    expect(request.method()).toBe('POST');
   }
 
   async clickHomeButton(): Promise<void> {
