@@ -1,47 +1,37 @@
-import { expect, Page } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
-/**
- * Page Object Model representing the Home page components and actions.
- */
 export class HomePage {
-  private page: Page;
+  readonly homeLink: Locator;
+  readonly signupLoginLink: Locator;
+  readonly contactUsLink: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
+  constructor(private readonly page: Page) {
+    this.homeLink = page.getByRole('link', { name: 'Home' });
+    this.signupLoginLink = page.getByRole('link', {
+      name: 'Signup / Login',
+    });
+    this.contactUsLink = page.getByRole('link', {
+      name: 'Contact us',
+    });
   }
 
-  /**
-   * Navigates the browser context directly to the base application home URL.
-   */
-  async navigateToHome(): Promise<void> {
-    await this.page.goto('http://automationexercise.com');
+  async open(): Promise<void> {
+    await this.page.goto('/');
   }
 
-  /**
-   * Asserts that the current page title matches the official application naming pattern.
-   */
-  async verifyTitle(): Promise<void> {
+  async expectToBeLoaded(): Promise<void> {
     await expect(this.page).toHaveTitle(/Automation Exercise/);
   }
 
-  /**
-   * Executes a programmatic click action on the Contact Us navigation link element.
-   */
-  async clickContactUs(): Promise<void> {
-    await this.page.click('a[href="/contact_us"]');
+  async openSignupLoginPage(): Promise<void> {
+    await this.signupLoginLink.click();
   }
 
-  /**
-   * Executes a programmatic click action on the Signup / Login navigation text link.
-   */
-  async clickSignupLogin(): Promise<void> {
-    await this.page.click('text=Signup / Login');
+  async openContactUsPage(): Promise<void> {
+    await this.contactUsLink.click();
   }
 
-  /**
-   * Routes the context back to root landing view by clicking the explicit Home button.
-   */
-  async clickHome(): Promise<void> {
-    await this.page.click('a[href="/"]');
+  async returnToHomePage(): Promise<void> {
+    await this.homeLink.click();
   }
 }

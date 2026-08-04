@@ -1,12 +1,17 @@
 import { test } from '@fixtures/page-objects';
 
-type UniqueUser = { uniqueName: string; uniqueEmail: string };
+type UniqueUser = {
+  uniqueName: string;
+  uniqueEmail: string;
+};
 
 function generateUniqueUser(): UniqueUser {
   const timestamp = Date.now();
-  const uniqueName = `TestUser${timestamp}`;
-  const uniqueEmail = `testuser${timestamp}@example.com`;
-  return { uniqueName, uniqueEmail };
+
+  return {
+    uniqueName: `TestUser${timestamp}`,
+    uniqueEmail: `testuser${timestamp}@example.com`,
+  };
 }
 
 test.describe('User Registration Workflows', () => {
@@ -18,31 +23,31 @@ test.describe('User Registration Workflows', () => {
     const { uniqueName, uniqueEmail } = generateUniqueUser();
 
     await test.step('Given I am on the home page', async () => {
-      await homePage.navigateToHome();
-      await homePage.verifyTitle();
+      await homePage.open();
+      await homePage.expectToBeLoaded();
     });
 
-    await test.step('When I click on Signup / Login button', async () => {
-      await homePage.clickSignupLogin();
+    await test.step('When I open the Signup / Login page', async () => {
+      await homePage.openSignupLoginPage();
     });
 
-    await test.step('Then New User Signup is visible', async () => {
+    await test.step('Then the New User Signup section is visible', async () => {
       await signupLoginPage.verifySignupSection();
     });
 
-    await test.step('When I enter name and email and click Signup', async () => {
+    await test.step('When I enter a unique name and email and start signup', async () => {
       await signupLoginPage.startSignup(uniqueName, uniqueEmail);
     });
 
-    await test.step('Then Enter Account Information is visible', async () => {
+    await test.step('Then the account information form is visible', async () => {
       await accountInfoPage.verifyAccountInfoPage();
     });
 
-    await test.step('When I fill account details', async () => {
+    await test.step('When I fill in the account details', async () => {
       await accountInfoPage.fillAccountDetails('Password123!');
     });
 
-    await test.step('And I fill address details', async () => {
+    await test.step('And I fill in the address details', async () => {
       await accountInfoPage.fillAddressDetails(
         'Test',
         'User',
@@ -57,31 +62,31 @@ test.describe('User Registration Workflows', () => {
       );
     });
 
-    await test.step('When I click Create Account', async () => {
+    await test.step('When I create the account', async () => {
       await accountInfoPage.createAccount();
     });
 
-    await test.step('Then Account Created is visible', async () => {
+    await test.step('Then the account should be created successfully', async () => {
       await accountInfoPage.verifyAccountCreated();
     });
 
-    await test.step('When I click Continue', async () => {
+    await test.step('When I continue to the application', async () => {
       await accountInfoPage.clickContinue();
     });
 
-    await test.step('Then I am logged in as username', async () => {
+    await test.step('Then I should be logged in as the newly created user', async () => {
       await signupLoginPage.verifyLoggedIn(uniqueName);
     });
 
-    await test.step('When I click Delete Account', async () => {
+    await test.step('When I delete the account', async () => {
       await accountInfoPage.deleteAccount();
     });
 
-    await test.step('Then Account Deleted is visible', async () => {
+    await test.step('Then the account should be deleted successfully', async () => {
       await accountInfoPage.verifyAccountDeleted();
     });
 
-    await test.step('When I click Continue again', async () => {
+    await test.step('When I continue after account deletion', async () => {
       await accountInfoPage.clickContinue();
     });
   });

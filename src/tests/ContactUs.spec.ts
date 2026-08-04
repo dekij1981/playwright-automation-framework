@@ -3,12 +3,12 @@ import { test } from '@fixtures/page-objects';
 test.describe('Contact Us Form E2E Workflows', () => {
   test('Test Case 6: Submit Contact Us Form successfully', async ({ homePage, contactUsPage }) => {
     await test.step('Navigate to home page', async () => {
-      await homePage.navigateToHome();
-      await homePage.verifyTitle();
+      await homePage.open();
+      await homePage.expectToBeLoaded();
     });
 
     await test.step('Go to Contact Us page', async () => {
-      await homePage.clickContactUs();
+      await homePage.openContactUsPage();
       await contactUsPage.verifyPageLoaded();
     });
 
@@ -31,7 +31,7 @@ test.describe('Contact Us Form E2E Workflows', () => {
 
     await test.step('Return home', async () => {
       await contactUsPage.clickHomeButton();
-      await homePage.verifyTitle();
+      await homePage.expectToBeLoaded();
     });
   });
 });
