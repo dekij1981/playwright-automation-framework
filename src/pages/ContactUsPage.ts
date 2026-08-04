@@ -1,56 +1,42 @@
-import { expect, Page, Locator } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
 export class ContactUsPage {
-  readonly page: Page;
-
   readonly contactForm: Locator;
-  readonly name: Locator;
-  readonly email: Locator;
-  readonly subject: Locator;
-  readonly message: Locator;
-  readonly upload: Locator;
-  readonly submitBtn: Locator;
-  readonly homeBtn: Locator;
+  readonly nameInput: Locator;
+  readonly emailInput: Locator;
+  readonly subjectInput: Locator;
+  readonly messageInput: Locator;
+  readonly uploadInput: Locator;
+  readonly submitButton: Locator;
+  readonly headerHomeLink: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
-
+  constructor(private readonly page: Page) {
     this.contactForm = page.locator('#contact-us-form');
 
-    this.name = this.contactForm.locator('input[data-qa="name"]');
-    this.email = this.contactForm.locator('input[data-qa="email"]');
-    this.subject = this.contactForm.locator('input[data-qa="subject"]');
-    this.message = this.contactForm.locator('textarea[data-qa="message"]');
+    this.nameInput = this.contactForm.locator('[data-qa="name"]');
+    this.emailInput = this.contactForm.locator('[data-qa="email"]');
+    this.subjectInput = this.contactForm.locator('[data-qa="subject"]');
+    this.messageInput = this.contactForm.locator('[data-qa="message"]');
+    this.uploadInput = this.contactForm.locator('input[name="upload_file"]');
+    this.submitButton = this.contactForm.locator('[data-qa="submit-button"]');
 
-    this.upload = this.contactForm.locator('input[name="upload_file"]');
-    this.submitBtn = this.contactForm.locator('input[data-qa="submit-button"]');
-
-    // FIX: Home link is in header, NOT inside form
-    this.homeBtn = page.getByRole('link', { name: /home/i });
+    this.headerHomeLink = page.locator('header').getByRole('link', { name: /home/i });
   }
-
-  // -------------------------
-  // NAVIGATION
-  // -------------------------
 
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
     await expect(this.contactForm).toBeVisible();
   }
 
-  // -------------------------
-  // ACTIONS
-  // -------------------------
-
   async fillForm(name: string, email: string, subject: string, message: string): Promise<void> {
-    await this.name.fill(name);
-    await this.email.fill(email);
-    await this.subject.fill(subject);
-    await this.message.fill(message);
+    await this.nameInput.fill(name);
+    await this.emailInput.fill(email);
+    await this.subjectInput.fill(subject);
+    await this.messageInput.fill(message);
   }
 
   async uploadFile(fileName: string, content: string): Promise<void> {
-    await this.upload.setInputFiles({
+    await this.uploadInput.setInputFiles({
       name: fileName,
       mimeType: 'text/plain',
       buffer: Buffer.from(content),
@@ -58,23 +44,27 @@ export class ContactUsPage {
   }
 
   async submitForm(): Promise<void> {
-    await expect(this.submitBtn).toBeVisible();
-    await expect(this.submitBtn).toBeEnabled();
+    this.page.once('dialog', async (dialog) => {
+      await dialog.accept();
+    });
 
-    await this.submitBtn.click();
+    const responsePromise = this.page.waitForResponse(
+      (response) => {
+        const url = new URL(response.url());
+        const normalizedPath = url.pathname.replace(/\/$/, '');
 
-    // UI stabilisation (no fake dialog / no fake waits)
-    await this.page.waitForLoadState('domcontentloaded');
+        return normalizedPath === '/contact_us' && response.request().method() === 'POST';
+      },
+      { timeout: 15_000 },
+    );
+
+    const [response] = await Promise.all([responsePromise, this.submitButton.click()]);
+
+    expect(response.status()).toBe(200);
   }
 
-  // -------------------------
-  // NAVIGATION ACTION
-  // -------------------------
-
   async clickHomeButton(): Promise<void> {
-    await expect(this.homeBtn).toBeVisible({ timeout: 10000 });
-    await this.homeBtn.click();
-
+    await this.headerHomeLink.click();
     await expect(this.page).toHaveURL('/');
   }
 }
