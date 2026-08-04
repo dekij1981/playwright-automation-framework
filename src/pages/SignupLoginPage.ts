@@ -1,80 +1,71 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect, Locator, Page } from '@playwright/test';
 
-/**
- * Page Object Model representing the Signup and Login page.
- * Handles selectors and actions for authenticating existing users and initializing new registrations.
- */
 export class SignupLoginPage {
-  private page: Page;
-  private loginForm: Locator;
-  private signupForm: Locator;
+  readonly loginForm: Locator;
+  readonly loginHeading: Locator;
+  readonly loginEmailInput: Locator;
+  readonly loginPasswordInput: Locator;
+  readonly loginButton: Locator;
+  readonly loginErrorMessage: Locator;
 
-  constructor(page: Page) {
-    this.page = page;
+  readonly signupForm: Locator;
+  readonly signupHeading: Locator;
+  readonly signupNameInput: Locator;
+  readonly signupEmailInput: Locator;
+  readonly signupButton: Locator;
 
-    // Scoped section containers to isolate elements and prevent form target overlapping
+  constructor(private readonly page: Page) {
     this.loginForm = page.locator('.login-form');
+    this.loginHeading = this.loginForm.getByRole('heading', {
+      name: 'Login to your account',
+    });
+    this.loginEmailInput = this.loginForm.locator('[data-qa="login-email"]');
+    this.loginPasswordInput = this.loginForm.locator('[data-qa="login-password"]');
+    this.loginButton = this.loginForm.getByRole('button', {
+      name: 'Login',
+    });
+    this.loginErrorMessage = this.loginForm.getByText('Your email or password is incorrect!');
+
     this.signupForm = page.locator('.signup-form');
-  }
-
-  // ==========================================
-  // Login Methods
-  // ==========================================
-
-  /**
-   * Verifies that the login form container heading section is visible on the view layer.
-   */
-  async verifyLoginSection(): Promise<void> {
-    const loginHeading = this.loginForm.getByRole('heading', { name: /login to your account/i });
-    await expect(loginHeading).toBeVisible();
-  }
-
-  /**
-   * Logs into the application by populating target credentials scoped inside the login form container.
-   */
-  async login(email: string, password: string): Promise<void> {
-    // Using robust attribute selectors explicitly nested within the login context layer
-    await this.loginForm.locator('input[data-qa="login-email"]').fill(email);
-    await this.loginForm.locator('input[data-qa="login-password"]').fill(password);
-    await this.loginForm.getByRole('button', { name: /login/i }).click();
-  }
-
-  /**
-   * Asserts the technical UI status dashboard text to guarantee successful session instantiation.
-   */
-  async verifyLoggedIn(username: string): Promise<void> {
-    await expect(this.page.locator(`text=Logged in as ${username}`)).toBeVisible();
-  }
-
-  /**
-   * Validates authentication failure boundaries by expecting error banner feedback structures.
-   */
-  async verifyLoginError(): Promise<void> {
-    await expect(this.page.locator('text=Your email or password is incorrect!')).toBeVisible({
-      timeout: 120000,
+    this.signupHeading = this.signupForm.getByRole('heading', {
+      name: 'New User Signup!',
+    });
+    this.signupNameInput = this.signupForm.locator('[data-qa="signup-name"]');
+    this.signupEmailInput = this.signupForm.locator('[data-qa="signup-email"]');
+    this.signupButton = this.signupForm.getByRole('button', {
+      name: 'Signup',
     });
   }
 
-  // ==========================================
-  // Signup Methods
-  // ==========================================
-
-  /**
-   * Verifies that the signup form container heading section is visible on the view layer.
-   */
-  async verifySignupSection(): Promise<void> {
-    const signupHeading = this.signupForm.getByRole('heading', { name: /new user signup!/i });
-    await expect(signupHeading).toBeVisible();
+  async verifyLoginSection(): Promise<void> {
+    await expect(this.loginHeading).toBeVisible();
   }
 
-  /**
-   * Initiates the new registration workflow path.
-   * Leverages explicit data-qa tags within the signup form container to eliminate element target conflicts.
-   */
+  async login(email: string, password: string): Promise<void> {
+    await this.loginEmailInput.fill(email);
+    await this.loginPasswordInput.fill(password);
+    await this.loginButton.click();
+  }
+
+  async verifyLoggedIn(username: string): Promise<void> {
+    const loggedInIndicator = this.page.getByText(`Logged in as ${username}`, {
+      exact: false,
+    });
+
+    await expect(loggedInIndicator).toBeVisible();
+  }
+
+  async verifyLoginError(): Promise<void> {
+    await expect(this.loginErrorMessage).toBeVisible();
+  }
+
+  async verifySignupSection(): Promise<void> {
+    await expect(this.signupHeading).toBeVisible();
+  }
+
   async startSignup(name: string, email: string): Promise<void> {
-    // Fixes the element locator collision by scoping controls directly inside the signup form wrapper
-    await this.signupForm.locator('input[data-qa="signup-name"]').fill(name);
-    await this.signupForm.locator('input[data-qa="signup-email"]').fill(email);
-    await this.signupForm.getByRole('button', { name: /signup/i }).click();
+    await this.signupNameInput.fill(name);
+    await this.signupEmailInput.fill(email);
+    await this.signupButton.click();
   }
 }
