@@ -2,10 +2,7 @@ import { invalidUser, validUser } from '@data/users';
 import { test } from '@fixtures/page-objects';
 
 test.describe('User Authentication Workflows', () => {
-  test('Test Case 2: Login User with correct email and password', async ({
-    homePage,
-    signupLoginPage,
-  }) => {
+  test('logs in with correct credentials', async ({ homePage, signupLoginPage }) => {
     await test.step('Given I am on the home page', async () => {
       await homePage.open();
       await homePage.expectToBeLoaded();
@@ -28,10 +25,7 @@ test.describe('User Authentication Workflows', () => {
     });
   });
 
-  test('Test Case 3: Login User with incorrect email and password', async ({
-    homePage,
-    signupLoginPage,
-  }) => {
+  test('shows an error for invalid credentials', async ({ homePage, signupLoginPage }) => {
     await test.step('Given I am on the home page', async () => {
       await homePage.open();
       await homePage.expectToBeLoaded();

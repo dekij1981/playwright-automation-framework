@@ -2,7 +2,7 @@ import { createRegistrationUser } from '@data/registration';
 import { test } from '@fixtures/page-objects';
 
 test.describe('User Registration Workflows', () => {
-  test('Test Case 1: Register User successfully', async ({
+  test('registers a new user successfully', async ({
     homePage,
     signupLoginPage,
     accountInfoPage,

@@ -1,7 +1,7 @@
 import { test } from '@fixtures/page-objects';
 
 test.describe('Contact Us Form E2E Workflows', () => {
-  test('Test Case 6: Submit Contact Us Form successfully', async ({ homePage, contactUsPage }) => {
+  test('submits the contact form successfully', async ({ homePage, contactUsPage }) => {
     await test.step('Navigate to home page', async () => {
       await homePage.open();
       await homePage.expectToBeLoaded();
