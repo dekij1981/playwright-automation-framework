@@ -1,18 +1,5 @@
+import { createRegistrationUser } from '@data/registration';
 import { test } from '@fixtures/page-objects';
-
-type UniqueUser = {
-  uniqueName: string;
-  uniqueEmail: string;
-};
-
-function generateUniqueUser(): UniqueUser {
-  const timestamp = Date.now();
-
-  return {
-    uniqueName: `TestUser${timestamp}`,
-    uniqueEmail: `testuser${timestamp}@example.com`,
-  };
-}
 
 test.describe('User Registration Workflows', () => {
   test('Test Case 1: Register User successfully', async ({
@@ -20,7 +7,7 @@ test.describe('User Registration Workflows', () => {
     signupLoginPage,
     accountInfoPage,
   }) => {
-    const { uniqueName, uniqueEmail } = generateUniqueUser();
+    const user = createRegistrationUser();
 
     await test.step('Given I am on the home page', async () => {
       await homePage.open();
@@ -36,7 +23,7 @@ test.describe('User Registration Workflows', () => {
     });
 
     await test.step('When I enter a unique name and email and start signup', async () => {
-      await signupLoginPage.startSignup(uniqueName, uniqueEmail);
+      await signupLoginPage.startSignup(user.name, user.email);
     });
 
     await test.step('Then the account information form is visible', async () => {
@@ -44,21 +31,21 @@ test.describe('User Registration Workflows', () => {
     });
 
     await test.step('When I fill in the account details', async () => {
-      await accountInfoPage.fillAccountDetails('Password123!');
+      await accountInfoPage.fillAccountDetails(user.password);
     });
 
     await test.step('And I fill in the address details', async () => {
       await accountInfoPage.fillAddressDetails(
-        'Test',
-        'User',
-        'Test Company',
-        '123 Test St',
-        'Suite 100',
-        'United States',
-        'Test State',
-        'Test City',
-        '12345',
-        '1234567890',
+        user.firstName,
+        user.lastName,
+        user.company,
+        user.address1,
+        user.address2,
+        user.country,
+        user.state,
+        user.city,
+        user.zipcode,
+        user.mobile,
       );
     });
 
@@ -75,7 +62,7 @@ test.describe('User Registration Workflows', () => {
     });
 
     await test.step('Then I should be logged in as the newly created user', async () => {
-      await signupLoginPage.verifyLoggedIn(uniqueName);
+      await signupLoginPage.verifyLoggedIn(user.name);
     });
 
     await test.step('When I delete the account', async () => {
