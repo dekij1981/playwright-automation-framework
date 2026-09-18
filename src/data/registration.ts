@@ -1,9 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-export type RegistrationUser = {
-  name: string;
-  email: string;
-  password: string;
+export type AddressDetails = {
   firstName: string;
   lastName: string;
   company: string;
@@ -14,6 +11,12 @@ export type RegistrationUser = {
   city: string;
   zipcode: string;
   mobile: string;
+};
+
+export type RegistrationUser = AddressDetails & {
+  name: string;
+  email: string;
+  password: string;
 };
 
 export function createRegistrationUser(): RegistrationUser {

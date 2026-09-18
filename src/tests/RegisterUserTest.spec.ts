@@ -35,18 +35,7 @@ test.describe('User Registration Workflows', () => {
     });
 
     await test.step('And I fill in the address details', async () => {
-      await accountInfoPage.fillAddressDetails(
-        user.firstName,
-        user.lastName,
-        user.company,
-        user.address1,
-        user.address2,
-        user.country,
-        user.state,
-        user.city,
-        user.zipcode,
-        user.mobile,
-      );
+      await accountInfoPage.fillAddressDetails(user);
     });
 
     await test.step('When I create the account', async () => {
