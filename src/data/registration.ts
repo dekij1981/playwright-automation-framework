@@ -1,5 +1,15 @@
 import { randomUUID } from 'node:crypto';
 
+export type AccountDetails = {
+  password: string;
+  title: 'Mr' | 'Mrs';
+  birthDay: string;
+  birthMonth: string;
+  birthYear: string;
+  newsletter: boolean;
+  specialOffers: boolean;
+};
+
 export type AddressDetails = {
   firstName: string;
   lastName: string;
@@ -13,11 +23,11 @@ export type AddressDetails = {
   mobile: string;
 };
 
-export type RegistrationUser = AddressDetails & {
-  name: string;
-  email: string;
-  password: string;
-};
+export type RegistrationUser = AccountDetails &
+  AddressDetails & {
+    name: string;
+    email: string;
+  };
 
 export function createRegistrationUser(): RegistrationUser {
   const uniqueId = randomUUID().slice(0, 8);
@@ -25,7 +35,15 @@ export function createRegistrationUser(): RegistrationUser {
   return {
     name: `TestUser${uniqueId}`,
     email: `testuser.${uniqueId}@example.com`,
+
     password: 'Password123!',
+    title: 'Mr',
+    birthDay: '1',
+    birthMonth: 'January',
+    birthYear: '1990',
+    newsletter: true,
+    specialOffers: true,
+
     firstName: 'Test',
     lastName: 'User',
     company: 'Test Company',

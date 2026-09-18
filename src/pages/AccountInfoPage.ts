@@ -1,10 +1,9 @@
 import { expect, Locator, Page } from '@playwright/test';
 
-import type { AddressDetails } from '@data/registration';
+import type { AccountDetails, AddressDetails } from '@data/registration';
 
 export class AccountInfoPage {
   readonly accountInfoHeading: Locator;
-  readonly titleMrRadio: Locator;
   readonly passwordInput: Locator;
   readonly daySelect: Locator;
   readonly monthSelect: Locator;
@@ -32,7 +31,6 @@ export class AccountInfoPage {
       name: /enter account information/i,
     });
 
-    this.titleMrRadio = page.locator('input[value="Mr"]');
     this.passwordInput = page.locator('input[name="password"]');
     this.daySelect = page.locator('select[name="days"]');
     this.monthSelect = page.locator('select[name="months"]');
@@ -72,14 +70,22 @@ export class AccountInfoPage {
     await expect(this.accountInfoHeading).toBeVisible();
   }
 
-  async fillAccountDetails(password: string): Promise<void> {
-    await this.titleMrRadio.check();
-    await this.passwordInput.fill(password);
-    await this.daySelect.selectOption('1');
-    await this.monthSelect.selectOption('January');
-    await this.yearSelect.selectOption('1990');
-    await this.newsletterCheckbox.check();
-    await this.specialOffersCheckbox.check();
+  async fillAccountDetails(details: AccountDetails): Promise<void> {
+    await this.page.locator(`input[value="${details.title}"]`).check();
+
+    await this.passwordInput.fill(details.password);
+
+    await this.daySelect.selectOption(details.birthDay);
+    await this.monthSelect.selectOption(details.birthMonth);
+    await this.yearSelect.selectOption(details.birthYear);
+
+    if (details.newsletter) {
+      await this.newsletterCheckbox.check();
+    }
+
+    if (details.specialOffers) {
+      await this.specialOffersCheckbox.check();
+    }
   }
 
   async fillAddressDetails(details: AddressDetails): Promise<void> {

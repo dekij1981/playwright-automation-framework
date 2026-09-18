@@ -31,7 +31,7 @@ test.describe('User Registration Workflows', () => {
     });
 
     await test.step('When I fill in the account details', async () => {
-      await accountInfoPage.fillAccountDetails(user.password);
+      await accountInfoPage.fillAccountDetails(user);
     });
 
     await test.step('And I fill in the address details', async () => {
