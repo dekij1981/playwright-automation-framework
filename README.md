@@ -46,16 +46,16 @@ The latest Playwright HTML report from the `main` branch is published automatica
 
 ## Tech Stack
 
-| Technology | Purpose |
-| --- | --- |
-| Playwright | UI and E2E test automation |
-| TypeScript | Test development and type safety |
-| Node.js | JavaScript runtime |
-| GitHub Actions | Continuous Integration |
-| GitHub Pages | Playwright report publishing |
-| Docker | Reproducible test execution environment |
-| ESLint | Static code analysis |
-| Prettier | Code formatting |
+| Technology     | Purpose                                 |
+| -------------- | --------------------------------------- |
+| Playwright     | UI and E2E test automation              |
+| TypeScript     | Test development and type safety        |
+| Node.js        | JavaScript runtime                      |
+| GitHub Actions | Continuous Integration                  |
+| GitHub Pages   | Playwright report publishing            |
+| Docker         | Reproducible test execution environment |
+| ESLint         | Static code analysis                    |
+| Prettier       | Code formatting                         |
 
 ---
 
@@ -101,3 +101,4 @@ The latest Playwright HTML report from the `main` branch is published automatica
 ├── playwright.config.ts
 ├── tsconfig.json
 └── README.md
+```
