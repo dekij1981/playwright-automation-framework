@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
+    outputs:
+      report-ready: ${{ steps.report-status.outputs.ready }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -52,8 +55,19 @@ jobs:
         env:
           WORKERS: 2
 
-      - name: Upload Playwright report
+      - name: Check if Playwright report exists
+        id: report-status
         if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          if [ -f playwright-report/index.html ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() && steps.report-status.outputs.ready == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
@@ -62,7 +76,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload report for GitHub Pages
-        if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: ${{ !cancelled() && steps.report-status.outputs.ready == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: actions/upload-pages-artifact@v5
         with:
           path: playwright-report/
@@ -94,11 +108,12 @@ jobs:
 
   deploy-report:
     name: Deploy Playwright Report
+
     needs:
       - quality-and-tests
       - docker-validation
 
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.quality-and-tests.outputs.report-ready == 'true' }}
 
     runs-on: ubuntu-24.04
 

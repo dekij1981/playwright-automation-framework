@@ -35,7 +35,7 @@ export default defineConfig({
   use: {
     baseURL: process.env.BASE_URL ?? 'https://automationexercise.com',
 
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
