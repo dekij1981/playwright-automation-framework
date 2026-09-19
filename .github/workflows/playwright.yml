@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - refactor/senior-framework
 
   pull_request:
     branches:
@@ -77,9 +76,27 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
+  docker-validation:
+    name: Docker Build and Test
+    needs: quality-and-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t playwright-framework .
+
+      - name: Run Playwright tests in Docker
+        run: docker run --rm playwright-framework
+
   deploy-report:
     name: Deploy Playwright Report
-    needs: quality-and-tests
+    needs:
+      - quality-and-tests
+      - docker-validation
 
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
