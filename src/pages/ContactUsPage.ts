@@ -50,21 +50,12 @@ export class ContactUsPage {
       await dialog.accept();
     });
 
-    const requestPromise = this.page.waitForRequest(
-      (request) => {
-        const url = new URL(request.url());
-        const normalizedPath = url.pathname.replace(/\/$/, '');
+    await this.submitButton.click();
 
-        return normalizedPath === '/contact_us' && request.method() === 'POST';
-      },
-      {
-        timeout: 15_000,
-      },
+    await expect(this.page.locator('#contact-page .status')).toHaveText(
+      'Success! Your details have been submitted successfully.',
     );
-
-    const [request] = await Promise.all([requestPromise, this.submitButton.click()]);
-
-    expect(request.method()).toBe('POST');
+    await expect(this.page.locator('#contact-page .status')).toBeVisible();
   }
 
   async clickHomeButton(): Promise<void> {
