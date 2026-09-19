@@ -27,6 +27,8 @@ export class ContactUsPage {
 
   async verifyPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/\/contact_us/);
+    // The submit handler is registered by an inline script after the form markup.
+    await this.page.waitForLoadState('domcontentloaded');
     await expect(this.contactForm).toBeVisible();
   }
 
