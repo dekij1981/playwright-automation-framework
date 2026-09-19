@@ -90,7 +90,7 @@ jobs:
         run: docker build -t playwright-framework .
 
       - name: Run Playwright tests in Docker
-        run: docker run --rm playwright-framework
+        run: docker run --rm -e WORKERS=1 playwright-framework
 
   deploy-report:
     name: Deploy Playwright Report
